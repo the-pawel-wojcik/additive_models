@@ -12,21 +12,21 @@ ha2cm = ha2eV * eV2cm
 
 def get_args():
     parser = argparse.ArgumentParser(
-            description="Prints out the CBS energies for each EOM state "
-            "together with half of the CBS–last-ab-initio difference.")
+        description="Prints out the CBS energies for each EOM state "
+        "together with half of the CBS–last-ab-initio difference.")
 
     parser.add_argument(
-            'ab_initio', help="JSON file with ab initio energies for each "
-            "basis set.")
+        'ab_initio', help="JSON file with ab initio energies for each "
+        "basis set.")
     parser.add_argument('cbs', help="JSON file with CBS energies.")
     parser.add_argument(
-            '-x', '--xsim',
-            help="Print output as a `better energies` input for xsim.",
-            action='store_true', default=False)
+        '-x', '--xsim',
+        help="Print output as a `better energies` input for xsim.",
+        action='store_true', default=False)
     parser.add_argument(
-            '-s', '--summary',
-            help="Print output to standard output.",
-            action='store_true', default=False)
+        '-s', '--summary',
+        help="Print output to standard output.",
+        action='store_true', default=False)
 
     args = parser.parse_args()
     return args
@@ -56,6 +56,12 @@ def flip_data_to_xsim_like(dataset):
 
     basis_data = list()
     for data in dataset:
+        if 'cc_energy' not in data:
+            raise RuntimeError(
+                "Some entries are missing the 'cc_energy' value. Most likely"
+                " you used the SCF at a basis where CC is not possible. Remove"
+                " the extra point from the ab initio json file."
+            )
         cc_energy = data['cc_energy']
         eom_states = list()
         for state in data['EOM']:
